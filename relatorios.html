@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatórios - Salgadaria</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4a90e2;
+            --success-color: #2ecc71;
+            --warning-color: #f1c40f;
+            --danger-color: #e74c3c;
+            --gray-light: #f5f6fa;
+            --gray-dark: #2f3640;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--gray-light);
+        }
+
+        header {
+            background-color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        a {
+            text-decoration: none;
+            color: white;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .search-box {
+            flex: 1;
+            max-width: 400px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 0.5rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #357abd;
+        }
+
+        .btn-secondary {
+            background-color: var(--gray-dark);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #232b33;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="logo">
+                <i class="fas fa-utensils"></i> Salgadaria
+            </div>
+            <div>
+                <button class="btn btn-secondary" id="btnVoltar">
+                    <i class="fas fa-arrow-left"></i> Voltar
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container">
+        <h1>Relatórios</h1>
+        <div class="actions">
+            <div>
+                <label for="mesAno">Selecione o mês e ano:</label>
+                <input type="month" id="mesAno">
+                <button class="btn btn-primary" id="gerarRelatorio">Gerar Relatório</button>
+            </div>
+        </div>
+        <div id="relatorioConteudo"></div>
+    </div>
+
+    <script>
+        // Adicione este script à página de relatórios
+document.addEventListener('DOMContentLoaded', () => {
+    const btnVoltar = document.getElementById('btnVoltar');
+    const mesAnoInput = document.getElementById('mesAno');
+    const gerarRelatorioBtn = document.getElementById('gerarRelatorio');
+    const relatorioConteudo = document.getElementById('relatorioConteudo');
+
+    btnVoltar.addEventListener('click', () => {
+        window.location.href = 'index.html';
+    });
+
+    gerarRelatorioBtn.addEventListener('click', gerarRelatorio);
+
+    function gerarRelatorio() {
+        const mesAno = mesAnoInput.value;
+        if (!mesAno) {
+            alert('Por favor, selecione um mês e ano.');
+            return;
+        }
+
+        // Simular dados de pedidos (substitua isso com seus dados reais)
+        const pedidos = JSON.parse(localStorage.getItem('pedidos')) || [];
+
+        const [ano, mes] = mesAno.split('-');
+        const pedidosDoMes = pedidos.filter(pedido => {
+            const dataPedido = new Date(pedido.dataHora);
+            return dataPedido.getFullYear() === parseInt(ano) && dataPedido.getMonth() === parseInt(mes) - 1;
+        });
+
+        const totais = {
+            'PAGO - CARTÃO': 0,
+            'PAGO - PIX': 0,
+            'PAGO - DINHEIRO': 0,
+            'PENDENTE DE PAGAMENTO': 0
+        };
+
+        pedidosDoMes.forEach(pedido => {
+            totais[pedido.status] += pedido.valor;
+        });
+
+        const totalRecebido = totais['PAGO - CARTÃO'] + totais['PAGO - PIX'] + totais['PAGO - DINHEIRO'];
+        const totalPendente = totais['PENDENTE DE PAGAMENTO'];
+
+        const relatorioHTML = `
+            <div class="card">
+                <h2>Relatório de ${mes}/${ano}</h2>
+                <h3>Total Recebido: ${formatarMoeda(totalRecebido)}</h3>
+                <ul>
+                    <li>Cartão: ${formatarMoeda(totais['PAGO - CARTÃO'])}</li>
+                    <li>PIX: ${formatarMoeda(totais['PAGO - PIX'])}</li>
+                    <li>Dinheiro: ${formatarMoeda(totais['PAGO - DINHEIRO'])}</li>
+                </ul>
+                <h3>Total Pendente: ${formatarMoeda(totalPendente)}</h3>
+                <p>Número de pedidos pendentes: ${pedidosDoMes.filter(p => p.status === 'PENDENTE DE PAGAMENTO').length}</p>
+            </div>
+        `;
+
+        relatorioConteudo.innerHTML = relatorioHTML;
+    }
+
+    function formatarMoeda(valor) {
+        return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    }
+});
+    </script>
+</body>
+</html>

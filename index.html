@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Pedidos - Salgadaria</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4a90e2;
+            --success-color: #2ecc71;
+            --warning-color: #f1c40f;
+            --danger-color: #e74c3c;
+            --gray-light: #f5f6fa;
+            --gray-dark: #2f3640;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--gray-light);
+        }
+
+        header {
+            background-color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        a {
+            text-decoration: none;
+            color: white;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .search-box {
+            flex: 1;
+            max-width: 400px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 0.5rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #357abd;
+        }
+
+        .btn-secondary {
+            background-color: var(--gray-dark);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #232b33;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .status-pendente {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .status-pago {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-edit {
+            color: var(--primary-color);
+        }
+
+        .btn-delete {
+            color: var(--danger-color);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 2rem auto;
+            padding: 2rem;
+            border-radius: 8px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .close {
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: #666;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        .form-group textarea {
+            height: 100px;
+            resize: vertical;
+        }
+
+        .delivery-options {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .delivery-option {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        #locationGroup {
+            display: none;
+        }
+
+        .date-group {
+            margin-bottom: 2rem;
+        }
+
+        .date-header {
+            background-color: #f8f9fa;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 4px;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        @media (max-width: 768px) {
+            .actions {
+                flex-direction: column;
+            }
+
+            .search-box {
+                max-width: 100%;
+            }
+
+            th, td {
+                padding: 0.5rem;
+            }
+        }
+
+        .maps-link {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .maps-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="logo">
+                <i class="fas fa-utensils"></i> Salgadaria
+            </div>
+            <div>
+                <button class="btn btn-secondary" id="btnRelatorios">
+                    <i class="fas fa-chart-bar"></i> <a href="./relatorios.html">Relatórios</a>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container">
+        <div class="actions">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Buscar pedidos...">
+            </div>
+            <div>
+                <input type="date" id="filtroData">
+                <button class="btn btn-secondary" id="limparFiltro">Limpar</button>
+            </div>
+            <button class="btn btn-primary" id="novoPedido">
+                <i class="fas fa-plus"></i> Novo Pedido
+            </button>
+        </div>
+        
+        <div id="pedidosPorData"></div>
+    </div>
+
+    <div id="pedidoModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Novo Pedido</h2>
+                <span class="close">&times;</span>
+            </div>
+            <form id="pedidoForm">
+                <input type="hidden" id="pedidoId">
+                <div class="form-group">
+                    <label for="cliente">Cliente</label>
+                    <input type="text" id="cliente" required>
+                </div>
+                <div class="form-group">
+                    <label for="contato">Contato</label>
+                    <input type="text" id="contato" required>
+                </div>
+                <div class="form-group">
+                    <label for="dataHora">Data e Hora</label>
+                    <input type="datetime-local" id="dataHora" required>
+                </div>
+                <div class="form-group">
+                    <label>Tipo de Entrega</label>
+                    <div class="delivery-options">
+                        <div class="delivery-option">
+                            <input type="radio" id="retirada" name="tipoEntrega" value="retirada" checked>
+                            <label for="retirada">Retirada</label>
+                        </div>
+                        <div class="delivery-option">
+                            <input type="radio" id="entrega" name="tipoEntrega" value="entrega">
+                            <label for="entrega">Entrega</label>
+                        </div>
+                    </div>
+                </div>
+                <div id="locationGroup" class="form-group">
+                    <label for="endereco">Endereço para Entrega</label>
+                    <input type="text" id="endereco">
+                </div>
+                <div class="form-group">
+                    <label for="descricao">Descrição</label>
+                    <textarea id="descricao" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="status">Status</label>
+                    <select id="status" required>
+                        <option value="PENDENTE DE PAGAMENTO">Pendente de Pagamento</option>
+                        <option value="PAGO - CARTÃO">Pago - Cartão</option>
+                        <option value="PAGO - PIX">Pago - PIX</option>
+                        <option value="PAGO - DINHEIRO">Pago - Dinheiro</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="valor">Valor</label>
+                    <input type="number" id="valor" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label for="observacao">Observação</label>
+                    <textarea id="observacao"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Salvar</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Dados mockados para exemplo
+        let pedidos = [
+            {
+                id: 1,
+                cliente: 'Maria Silva',
+                contato: '(11) 98765-4321',
+                dataHora: '2024-10-06T15:30',
+                tipoEntrega: 'retirada',
+                endereco: '',
+                descricao: '100 coxinhas, 50 kibe',
+                status: 'PENDENTE DE PAGAMENTO',
+                valor: 350.00,
+                observacao: 'Entregar no salão'
+            }
+        ];
+
+        // Elementos do DOM
+        const pedidosPorDataEl = document.getElementById('pedidosPorData');
+        const searchInput = document.getElementById('searchInput');
+        const filtroDataEl = document.getElementById('filtroData');
+        const limparFiltroBtn = document.getElementById('limparFiltro');
+        const novoPedidoBtn = document.getElementById('novoPedido');
+        const modal = document.getElementById('pedidoModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const closeModal = modal.querySelector('.close');
+        const pedidoForm = document.getElementById('pedidoForm');
+
+        // Funções auxiliares
+        function formatarDataHora(dataHora) {
+            const data = new Date(dataHora);
+            return data.toLocaleString('pt-BR', { 
+                day: '2-digit', 
+                month: '2-digit', 
+                year: 'numeric', 
+                hour: '2-digit', 
+                minute: '2-digit'
+            });
+        }
+
+        function formatarMoeda(valor) {
+            return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        }
+
+        function formatarTelefone(telefone) {
+            const cleaned = ('' + telefone).replace(/\D/g, '');
+            const match = cleaned.match(/^(\d{2})(\d{5})(\d{4})$/);
+            if (match) {
+                return '(' + match[1] + ') ' + match[2] + '-' + match[3];
+            }
+            return telefone;
+        }
+
+        // Funções principais
+        function agruparPedidosPorData(pedidosList) {
+            const grupos = {};
+            pedidosList.forEach(pedido => {
+                const data = new Date(pedido.dataHora).toLocaleDateString('pt-BR');
+                if (!grupos[data]) grupos[data] = [];
+                grupos[data].push(pedido);
+            });
+            Object.keys(grupos).forEach(data => {
+                grupos[data].sort((a, b) => new Date(a.dataHora) - new Date(b.dataHora));
+            });
+            return grupos;
+        }
+
+        function atualizarTabela(pedidosFiltrados = pedidos) {
+            pedidosPorDataEl.innerHTML = '';
+            const gruposPedidos = agruparPedidosPorData(pedidosFiltrados);
+
+            Object.entries(gruposPedidos).forEach(([data, pedidosGrupo]) => {
+                const dateGroup = document.createElement('div');
+                dateGroup.className = 'date-group';
+                dateGroup.innerHTML = `
+                    <div class="date-header">${data}</div>
+                    <div class="card">
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Cliente</th>
+                                        <th>Contato</th>
+                                        <th>Horário</th>
+                                        <th>Descrição</th>
+                                        <th>Entrega</th>
+                                        <th>Status</th>
+                                        <th>Valor</th>
+                                        <th>Observações</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${pedidosGrupo.map(pedido => `
+                                        <tr>
+                                            <td>${pedido.cliente}</td>
+                                            <td>${formatarTelefone(pedido.contato)}</td>
+                                            <td>${new Date(pedido.dataHora).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</td>
+                                            <td>${pedido.descricao}</td>
+                                            <td>${pedido.tipoEntrega === 'entrega' ? 
+                                                `<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(pedido.endereco)}" target="_blank" class="maps-link">
+                                                    Entrega: ${pedido.endereco}
+                                                </a>` : 
+                                                'Retirada'}
+                                            </td>
+                                            <td><span class="status-badge ${pedido.status.includes('PENDENTE') ? 'status-pendente' : 'status-pago'}">${pedido.status}</span></td>
+                                            <td>${formatarMoeda(pedido.valor)}</td>
+                                            <td>${pedido.observacao || ''}</td>
+                                            <td class="action-buttons">
+                                                <button class="btn-edit" onclick="editarPedido(${pedido.id})">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn-delete" onclick="deletarPedido(${pedido.id})">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+                pedidosPorDataEl.appendChild(dateGroup);
+            });
+        }
+
+        function filtrarPedidos() {
+            const termo = searchInput.value.toLowerCase();
+            const data = filtroDataEl.value;
+            
+            const pedidosFiltrados = pedidos.filter(pedido => {
+                const matchTermo = pedido.cliente.toLowerCase().includes(termo) || 
+                                   pedido.descricao.toLowerCase().includes(termo);
+                const matchData = data ? new Date(pedido.dataHora).toLocaleDateString('en-CA') === data : true;
+                return matchTermo && matchData;
+            });
+            
+            atualizarTabela(pedidosFiltrados);
+        }
+
+        function toggleLocation() {
+            const tipoEntrega = document.querySelector('input[name="tipoEntrega"]:checked').value;
+            document.getElementById('locationGroup').style.display = tipoEntrega === 'entrega' ? 'block' : 'none';
+        }
+
+        function abrirModal(pedido = null) {
+            modalTitle.textContent = pedido ? 'Editar Pedido' : 'Novo Pedido';
+            pedidoForm.reset();
+
+            if (pedido) {
+                document.getElementById('pedidoId').value = pedido.id;
+                document.getElementById('cliente').value = pedido.cliente;
+                document.getElementById('contato').value = pedido.contato;
+                document.getElementById('dataHora').value = pedido.dataHora;
+                document.querySelector(`input[name="tipoEntrega"][value="${pedido.tipoEntrega}"]`).checked = true;
+                document.getElementById('endereco').value = pedido.endereco || '';
+                document.getElementById('descricao').value = pedido.descricao;
+                document.getElementById('status').value = pedido.status;
+                document.getElementById('valor').value = pedido.valor;
+                document.getElementById('observacao').value = pedido.observacao;
+            } else {
+                document.getElementById('pedidoId').value = '';
+            }
+
+            toggleLocation();
+            modal.style.display = 'block';
+        }
+
+        function fecharModal() {
+            modal.style.display = 'none';
+        }
+
+        function salvarPedido(event) {
+            event.preventDefault();
+            const form = event.target;
+            const pedidoId = document.getElementById('pedidoId').value;
+            
+            const dadosPedido = {
+                id: pedidoId ? parseInt(pedidoId) : Date.now(),
+                cliente: form.cliente.value,
+                contato: form.contato.value,
+                dataHora: form.dataHora.value,
+                tipoEntrega: form.tipoEntrega.value,
+                endereco: form.tipoEntrega.value === 'entrega' ? form.endereco.value : '',
+                descricao: form.descricao.value,
+                status: form.status.value,
+                valor: parseFloat(form.valor.value),
+                observacao: form.observacao.value
+            };
+
+            if (pedidoId) {
+                const index = pedidos.findIndex(p => p.id === parseInt(pedidoId));
+                if (index !== -1) {
+                    pedidos[index] = dadosPedido;
+                }
+            } else {
+                pedidos.push(dadosPedido);
+            }
+
+            atualizarTabela();
+            fecharModal();
+        }
+
+        function editarPedido(id) {
+            const pedido = pedidos.find(p => p.id === id);
+            if (pedido) {
+                abrirModal(pedido);
+            }
+        }
+
+        function deletarPedido(id) {
+            if (confirm('Tem certeza que deseja excluir este pedido?')) {
+                pedidos = pedidos.filter(p => p.id !== id);
+                atualizarTabela();
+            }
+        }
+
+        // Event Listeners
+        searchInput.addEventListener('input', filtrarPedidos);
+        filtroDataEl.addEventListener('change', filtrarPedidos);
+        limparFiltroBtn.addEventListener('click', () => {
+            searchInput.value = '';
+            filtroDataEl.value = '';
+            atualizarTabela(); // Isso exibirá todos os pedidos novamente
+        });
+        novoPedidoBtn.addEventListener('click', () => abrirModal());
+        closeModal.addEventListener('click', fecharModal);
+        pedidoForm.addEventListener('submit', salvarPedido);
+        document.querySelectorAll('input[name="tipoEntrega"]').forEach(radio => {
+            radio.addEventListener('change', toggleLocation);
+        });
+
+        window.onclick = function(event) {
+            if (event.target === modal) {
+                fecharModal();
+            }
+        };
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', () => {
+            atualizarTabela();
+        });
+        // Adicione isso ao final do script existente
+            document.getElementById('btnRelatorios').addEventListener('click', () => {
+                window.location.href = 'relatorios.html';
+            });
+    </script>
+</body>
+</html>
