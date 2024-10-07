@@ -1,8 +1,8 @@
-// Substitua a inicialização atual por esta:
-const { createClient } = supabase
-const supabaseClient = createClient('https://omomlabrgcxgeejhcrod.supabase.c, eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9tb21sYWJyZ2N4Z2Vlamhjcm9kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjgyMjM0NDIsImV4cCI6MjA0Mzc5OTQ0Mn0.Kl2IpEMkwoSiYlAqOxkyUhRfFmIea11kwdVldf6whyw')
-const SUPABASE_URL = 'https://omomlabrgcxgeejhcrod.supabase.c'
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9tb21sYWJyZ2N4Z2Vlamhjcm9kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjgyMjM0NDIsImV4cCI6MjA0Mzc5OTQ0Mn0.Kl2IpEMkwoSiYlAqOxkyUhRfFmIea11kwdVldf6whyw'
+// Supabase configuration
+const SUPABASE_URL = 'https://omomlabrgcxgeejhcrod.supabase.co'
+const SUPABASE_ANON_KEY = 'sua_chave_anonima_do_supabase'
+
+const supabase = supabaseJs.createClient('https://omomlabrgcxgeejhcrod.supabase.co, eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9tb21sYWJyZ2N4Z2Vlamhjcm9kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjgyMjM0NDIsImV4cCI6MjA0Mzc5OTQ0Mn0.Kl2IpEMkwoSiYlAqOxkyUhRfFmIea11kwdVldf6whyw')
 
 // Função para testar a conexão
 async function testarConexao() {
@@ -81,3 +81,5 @@ async function deletarPedido(id) {
         }
     }
 }
+
+console.log('Supabase client:', supabase)
