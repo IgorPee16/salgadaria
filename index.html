@@ -619,6 +619,123 @@
             document.getElementById('btnRelatorios').addEventListener('click', () => {
                 window.location.href = 'relatorios.html';
             });
+
+        // Adicione estas funções ao seu código JavaScript existente
+
+// Função para testar a conexão com o Supabase
+async function testarConexao() {
+    try {
+        const { data, error } = await supabase
+            .from('pedidos')
+            .select('count', { count: 'exact', head: true })
+
+        if (error) throw error
+
+        console.log('✅ Conexão com Supabase estabelecida com sucesso!')
+        console.log(`📊 Número de pedidos na base: ${data}`)
+        return true
+    } catch (error) {
+        console.error('❌ Erro na conexão com Supabase:', error.message)
+        return false
+    }
+}
+
+// Função para testar todas as operações CRUD
+async function testarOperacoesCRUD() {
+    console.log('🏁 Iniciando testes de CRUD...')
+    
+    try {
+        // Teste CREATE
+        const novoPedido = {
+            cliente: 'Cliente Teste',
+            contato: '(11) 99999-9999',
+            dataHora: new Date().toISOString(),
+            tipoEntrega: 'retirada',
+            descricao: 'Pedido de teste automatizado',
+            status: 'PENDENTE DE PAGAMENTO',
+            valor: 50.00,
+            observacao: 'Pedido criado pelo teste automatizado'
+        }
+        
+        console.log('📝 Tentando criar novo pedido...')
+        const { data: pedidoCriado, error: erroCreate } = await supabase
+            .from('pedidos')
+            .insert([novoPedido])
+            .select()
+        
+        if (erroCreate) throw new Error(`Erro ao criar: ${erroCreate.message}`)
+        console.log('✅ CREATE - Pedido criado com sucesso:', pedidoCriado[0])
+        
+        const pedidoId = pedidoCriado[0].id
+
+        // Teste READ
+        console.log('🔍 Tentando ler o pedido criado...')
+        const { data: pedidoLido, error: erroRead } = await supabase
+            .from('pedidos')
+            .select('*')
+            .eq('id', pedidoId)
+            .single()
+        
+        if (erroRead) throw new Error(`Erro ao ler: ${erroRead.message}`)
+        console.log('✅ READ - Pedido lido com sucesso:', pedidoLido)
+
+        // Teste UPDATE
+        console.log('📝 Tentando atualizar o pedido...')
+        const { data: pedidoAtualizado, error: erroUpdate } = await supabase
+            .from('pedidos')
+            .update({ valor: 75.00, observacao: 'Pedido atualizado pelo teste' })
+            .eq('id', pedidoId)
+            .select()
+        
+        if (erroUpdate) throw new Error(`Erro ao atualizar: ${erroUpdate.message}`)
+        console.log('✅ UPDATE - Pedido atualizado com sucesso:', pedidoAtualizado[0])
+
+        // Teste DELETE
+        console.log('🗑️ Tentando deletar o pedido...')
+        const { error: erroDelete } = await supabase
+            .from('pedidos')
+            .delete()
+            .eq('id', pedidoId)
+        
+        if (erroDelete) throw new Error(`Erro ao deletar: ${erroDelete.message}`)
+        console.log('✅ DELETE - Pedido deletado com sucesso')
+
+        console.log('🎉 Todos os testes completados com sucesso!')
+        return true
+    } catch (error) {
+        console.error('❌ Erro durante os testes:', error.message)
+        return false
+    }
+}
+
+// Função para executar todos os testes
+async function executarTodosTestes() {
+    console.log('🚀 Iniciando bateria de testes...')
+    
+    const conexaoOk = await testarConexao()
+    if (!conexaoOk) {
+        console.error('❌ Testes interrompidos devido a falha na conexão')
+        return
+    }
+    
+    await testarOperacoesCRUD()
+}
+
+// Adicione um botão de teste à sua interface (opcional)
+function adicionarBotaoTeste() {
+    const botaoTeste = document.createElement('button')
+    botaoTeste.className = 'btn btn-secondary'
+    botaoTeste.innerHTML = '<i class="fas fa-vial"></i> Testar Conexão'
+    botaoTeste.onclick = executarTodosTestes
+    
+    const container = document.querySelector('.actions')
+    container.appendChild(botaoTeste)
+}
+
+// Chame esta função quando a página carregar
+document.addEventListener('DOMContentLoaded', () => {
+    adicionarBotaoTeste()
+})
     </script>
 </body>
 </html>
